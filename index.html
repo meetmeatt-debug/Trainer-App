@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FitTrack – Trainer Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#0F1E36;--navy2:#1B3156;--green:#2FB872;--greenD:#1E8F57;--gsoft:#E2F4EA;--bg:#F1F3F6;--card:#FFFFFF;--ink:#0F1E36;--mute:#5E6B80;--line:#E1E5EB;--warn:#B4650A;--wsoft:#FDEFD9;--red:#C03333;--rsoft:#FBE4E4;--grey:#6F7A8E;--gysoft:#E8EBF0;--inp:#FFFFFF;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#09131F;--card:#112038;--ink:#EAF0F8;--mute:#9DACC2;--line:#233755;--gsoft:#143A2B;--wsoft:#3B2C12;--rsoft:#3E1C1F;--gysoft:#1D2D47;--warn:#F0A04B;--red:#F07A7A;--greenD:#4FD08C;--grey:#97A4BA;--inp:#0C192C;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#09131F;--card:#112038;--ink:#EAF0F8;--mute:#9DACC2;--line:#233755;--gsoft:#143A2B;--wsoft:#3B2C12;--rsoft:#3E1C1F;--gysoft:#1D2D47;--warn:#F0A04B;--red:#F07A7A;--greenD:#4FD08C;--grey:#97A4BA;--inp:#0C192C;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:15px/1.45 Manrope,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums;-webkit-text-size-adjust:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{margin:0;line-height:1.2}
+h2{font-size:17px;font-weight:700}
+h3{font-size:15px;font-weight:700}
+small,.mute{color:var(--mute)}
+#wrap{min-height:100vh}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--navy);color:#fff;display:flex;align-items:center;gap:10px;padding:12px 16px}
+.top .logo{width:34px;height:34px;border-radius:10px;background:var(--green);display:grid;place-items:center;color:var(--navy);font-weight:800}
+.top .ttl{flex:1;min-width:0}
+.top .ttl b{display:block;font-size:16px}
+.top .ttl span{font-size:12px;opacity:.75}
+.top .sv{font-size:11px;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.12)}
+.top button{background:rgba(255,255,255,.12);border:0;color:#fff;width:38px;height:38px;border-radius:10px;cursor:pointer;display:grid;place-items:center}
+main{max-width:980px;margin:0 auto;padding:16px 14px 110px}
+nav.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--navy);display:grid;grid-template-columns:repeat(6,1fr);padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+nav.nav button{background:none;border:0;color:#9FB0CA;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:600;padding:6px 0;cursor:pointer;border-radius:10px;min-height:48px}
+nav.nav button.on{color:var(--green)}
+@media (min-width:900px){
+ nav.nav{top:0;right:auto;width:210px;display:flex;flex-direction:column;padding:78px 12px 12px;gap:4px}
+ nav.nav button{flex-direction:row;font-size:14px;gap:12px;padding:10px 12px;justify-content:flex-start}
+ nav.nav button.on{background:rgba(47,184,114,.14)}
+ #wrap{margin-left:210px}
+ main{padding-bottom:40px}
+ .top{padding-left:24px}
+}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:10px;align-items:center}
+.sp{flex:1}
+.wrapr{flex-wrap:wrap}
+.tiles{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+@media (min-width:640px){.tiles{grid-template-columns:repeat(4,1fr)}}
+.tile{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--navy2);border-radius:12px;padding:10px 12px}
+.tile.g{border-left-color:var(--green)}.tile.o{border-left-color:#E58A1F}.tile.r{border-left-color:#D64545}
+.tile b{display:block;font-size:22px;font-weight:800;margin-top:2px}
+.tile span{font-size:12px;color:var(--mute)}
+.btn{min-height:44px;padding:0 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);font-weight:700;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;text-decoration:none;color:var(--ink)}
+.btn.pri{background:var(--green);border-color:var(--green);color:#06210F}
+.btn.dark{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.red{color:var(--red)}
+.btn.sm{min-height:36px;padding:0 12px;font-size:13px;border-radius:10px}
+.btn.blk{width:100%}
+.btn:disabled{opacity:.5;cursor:default}
+.short{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:12px}
+@media (min-width:640px){.short{grid-template-columns:repeat(4,1fr)}}
+.short .btn{flex-direction:column;min-height:74px;font-size:13px;text-align:center}
+.chip{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:99px;white-space:nowrap}
+.chip.g{background:var(--gsoft);color:var(--greenD)}
+.chip.o{background:var(--wsoft);color:var(--warn)}
+.chip.r{background:var(--rsoft);color:var(--red)}
+.chip.rr{background:var(--red);color:#fff}
+.chip.gy{background:var(--gysoft);color:var(--grey)}
+.chip.b{background:var(--navy);color:#fff}
+.chip.ol{border:1px solid var(--line);color:var(--mute)}
+.srow{display:grid;grid-template-columns:78px 1fr;gap:6px 10px;padding:12px 0;border-top:1px solid var(--line)}
+.srow:first-of-type{border-top:0}
+.stime{font-weight:800;font-size:14px}
+.stime small{display:block;font-weight:500}
+.sinfo b{display:block}
+.sinfo .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--mute)}
+.srow .att{grid-column:1/-1}
+@media (min-width:700px){.srow{grid-template-columns:90px 1fr auto}.srow .att{grid-column:auto}}
+.srow.st-rescheduled .sinfo b,.srow.st-cancelled .sinfo b{text-decoration:line-through;color:var(--grey)}
+.seg{display:flex;gap:6px}
+.seg button{flex:1;min-height:40px;border-radius:10px;border:1px solid var(--line);background:var(--card);font-weight:700;font-size:13px;cursor:pointer;padding:0 10px}
+.seg button.on.present{background:var(--green);border-color:var(--green);color:#06210F}
+.seg button.on.absent{background:var(--red);border-color:var(--red);color:#fff}
+.seg button.on.rescheduled{background:#E58A1F;border-color:#E58A1F;color:#1d1200}
+.tabs{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto}
+.tabs button{border:1px solid var(--line);background:var(--card);border-radius:99px;padding:0 16px;min-height:38px;font-weight:700;cursor:pointer;white-space:nowrap}
+.tabs button.on{background:var(--navy);border-color:var(--navy);color:#fff}
+input,select,textarea{width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--inp)}
+textarea{min-height:200px;line-height:1.45;resize:vertical}
+label.f{display:block;font-size:12.5px;font-weight:700;color:var(--mute);margin:10px 0 4px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.dchips{display:flex;gap:6px;flex-wrap:wrap}
+.dchip{position:relative}
+.dchip input{position:absolute;opacity:0;inset:0;width:100%;min-height:0;cursor:pointer}
+.dchip span{display:block;padding:9px 12px;border:1px solid var(--line);border-radius:10px;font-weight:700;font-size:13px;background:var(--inp)}
+.dchip input:checked + span{background:var(--navy);color:#fff;border-color:var(--navy)}
+.dchip input:focus-visible + span{outline:2px solid var(--green);outline-offset:2px}
+.ov{position:fixed;inset:0;background:rgba(5,12,24,.6);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--card);width:100%;max-width:560px;max-height:92vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(18px + env(safe-area-inset-bottom,0px))}
+@media (min-width:700px){.ov{align-items:center}.sheet{border-radius:18px}}
+.sheet .hd{display:flex;align-items:center;margin-bottom:6px}
+.x{border:0;background:var(--gysoft);width:36px;height:36px;border-radius:10px;font-size:18px;cursor:pointer}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom,0px));background:var(--navy);color:#fff;padding:10px 16px;border-radius:12px;font-weight:600;z-index:80;max-width:90vw;box-shadow:0 4px 18px rgba(0,0,0,.3)}
+@media (min-width:900px){.toast{bottom:24px}}
+.banner{background:var(--wsoft);color:var(--warn);border-radius:12px;padding:12px 14px;margin-bottom:12px;font-weight:600}
+.banner.g{background:var(--gsoft);color:var(--greenD)}
+.list .it{display:flex;gap:10px;align-items:center;padding:12px 0;border-top:1px solid var(--line);cursor:pointer}
+.list .it:first-child{border-top:0}
+.av{width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;display:grid;place-items:center;font-weight:800;flex:none}
+.kv{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:14px}
+.kv span{color:var(--mute);display:block;font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th,td{text-align:left;padding:9px 8px;border-top:1px solid var(--line);white-space:nowrap}
+th{font-size:12px;color:var(--mute);border-top:0}
+.scroll{overflow-x:auto}
+.prog{height:12px;background:var(--gysoft);border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--green)}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:9px 0;border-top:1px solid var(--line)}
+.chk:first-of-type{border-top:0}
+.dot{width:22px;height:22px;border-radius:50%;border:2px solid var(--line);flex:none;display:grid;place-items:center;font-size:13px;font-weight:800}
+.dot.ok{background:var(--green);border-color:var(--green);color:#06210F}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cal .h{font-size:11px;color:var(--mute);text-align:center;font-weight:700;padding:4px 0}
+.cal .d{min-height:62px;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:5px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:3px}
+.cal .d.today{border-color:var(--green);box-shadow:inset 0 0 0 1px var(--green)}
+.cal .d.empty{visibility:hidden}
+.cal .d b{font-size:12px}
+.dots{display:flex;gap:3px;flex-wrap:wrap}
+.dots i{width:8px;height:8px;border-radius:50%;display:block}
+.lg{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--mute);margin:8px 0}
+.lg span{display:flex;align-items:center;gap:5px}
+.lg i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.bar{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:13px}
+.bar .tr{flex:1;height:14px;background:var(--gysoft);border-radius:6px;position:relative;overflow:hidden}
+.bar .tr i{position:absolute;left:0;top:0;bottom:0;background:var(--navy2);opacity:.28}
+.bar .tr u{position:absolute;left:0;top:0;bottom:0;background:var(--green);text-decoration:none}
+.empty{text-align:center;color:var(--mute);padding:22px 8px}
+.mn{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.mn b{flex:1;text-align:center;font-size:16px}
+.mn button{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:18px;font-weight:700}
+a.lnk{color:inherit}
+:focus-visible{outline:2px solid var(--green);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="wrap">
+ <header class="top"><div class="logo">F</div><div class="ttl"><b>FitTrack</b><span id="sub">Trainer Manager</span></div><span class="sv" id="sv"></span><button id="gear" data-act="settings" aria-label="Settings"></button></header>
+ <main id="app"><div class="empty">Loading your clients…</div></main>
+</div>
+<nav class="nav" id="nav" aria-label="Main"></nav>
+<div id="modal"></div>
+<div id="toast"></div>
+
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+const TZ="Asia/Kolkata";
+const MN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const DW=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+const todayStr=()=>new Date().toLocaleDateString("en-CA",{timeZone:TZ});
+const nowMin=()=>{const p=new Date().toLocaleTimeString("en-GB",{timeZone:TZ,hour12:false}).split(":");return +p[0]*60+ +p[1]};
+const pd=s=>{const [y,m,d]=s.split("-").map(Number);return new Date(Date.UTC(y,m-1,d))};
+const fd=d=>d.toISOString().slice(0,10);
+const addDays=(s,n)=>{const d=pd(s);d.setUTCDate(d.getUTCDate()+n);return fd(d)};
+const dow=s=>pd(s).getUTCDay();
+const monthOf=s=>s.slice(0,7);
+const addMonths=(m,n)=>{let [y,mm]=m.split("-").map(Number);mm+=n-1;y+=Math.floor(mm/12);mm=((mm%12)+12)%12;return y+"-"+String(mm+1).padStart(2,"0")};
+const dim=m=>{const [y,mm]=m.split("-").map(Number);return new Date(Date.UTC(y,mm,0)).getUTCDate()};
+const mLabel=m=>MN[+m.slice(5)-1]+" "+m.slice(0,4);
+const dLabel=s=>{const d=pd(s);return d.getUTCDate()+" "+MON[d.getUTCMonth()]+" "+d.getUTCFullYear()};
+const dShort=s=>{const d=pd(s);return DW[d.getUTCDay()]+", "+d.getUTCDate()+" "+MON[d.getUTCMonth()]};
+const t2m=t=>{const [h,m]=t.split(":").map(Number);return h*60+m};
+const t12=t=>{let [h,m]=t.split(":").map(Number);const ap=h>=12?"PM":"AM";h=h%12||12;return h+":"+String(m).padStart(2,"0")+" "+ap};
+const inr=n=>"₹"+Math.round(n).toLocaleString("en-IN");
+const uid=()=>Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pad2=n=>String(n).padStart(2,"0");
+const stamp=ts=>{const d=new Date(ts);return d.toLocaleDateString("en-GB",{timeZone:TZ,day:"2-digit",month:"short"})+", "+d.toLocaleTimeString("en-IN",{timeZone:TZ,hour:"numeric",minute:"2-digit",hour12:true})};
+const IC={home:'<path d="M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.5-3.5 3-5.5 6.5-5.5s6 2 6.5 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5c2 .6 3.3 2.4 3.5 5.5"/>',cal:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',check:'<circle cx="12" cy="12" r="9"/><path d="M8 12.5l3 3 5-6"/>',rupee:'<path d="M7 5h11M7 10h11M7 5c6 0 6 8 0 8h-1l8 7"/>',clip:'<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9zM9 13l2 2 4-4"/>',gear:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'};
+const ic=n=>`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;
+const NAV=[["home","Home","home"],["clients","Clients","users"],["schedule","Schedule","cal"],["attendance","Attendance","check"],["payments","Payments","rupee"],["monthly","Monthly","clip"]];
+
+/* ---------- state ---------- */
+let S=null,docRef=null,mode="loading",saveT=null,lastW=0,saveState="";
+const T0=todayStr();
+const ui={tab:"home",clientId:null,q:"",sv:"day",sd:T0,ad:T0,month:monthOf(T0),mtab:"closing",payOpen:null,modal:null,confirm:null};
+const LS="fittrack-v1";
+const cl=id=>S.clients.find(c=>c.id===id);
+const sess=id=>S.sessions.find(s=>s.id===id);
+const pay=id=>S.payments.find(p=>p.id===id);
+const aud=(type,text)=>{S.audit.unshift({ts:Date.now(),type,text});S.audit=S.audit.slice(0,200)};
+
+function save(){
+  saveState="Saving…";paintSv();
+  clearTimeout(saveT);
+  saveT=setTimeout(async()=>{
+    const ts=Date.now();lastW=ts;
+    try{
+      if(mode==="cloud"&&docRef){await docRef.set({json:JSON.stringify(S),updated:ts})}
+      else{try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}}
+      saveState="Saved";
+    }catch(e){saveState="Not saved";toast("Couldn’t save. Check your connection and try again.")}
+    paintSv();
+  },350);
+}
+function paintSv(){const el=document.getElementById("sv");if(!el)return;el.textContent=mode==="cloud"?(saveState||"Cloud synced"):"This device only"}
+
+/* ---------- business logic ---------- */
+function conflict(date,time,dur,ignore){
+  const a=t2m(time),b=a+dur;
+  return S.sessions.find(x=>x.id!==ignore&&x.date===date&&!["rescheduled","cancelled"].includes(x.status)&&t2m(x.time)<b&&a<t2m(x.time)+x.dur);
+}
+const slotTime=(c,d)=>(c.times&&c.times[d])||null;
+const slotText=c=>[1,2,3,4,5,6,0].filter(d=>slotTime(c,d)).map(d=>DW[d]+" "+t12(c.times[d])).join(", ");
+function ensureSessions(m,minDate){
+  let add=0,skip=0;
+  for(const c of S.clients){
+    if(c.status!=="active")continue;
+    for(let d=1;d<=dim(m);d++){
+      const ds=m+"-"+pad2(d);
+      if(ds<c.start||(minDate&&ds<minDate))continue;
+      const ct=slotTime(c,dow(ds));if(!ct)continue;
+      if(S.sessions.some(s=>s.clientId===c.id&&s.date===ds&&s.kind==="regular"))continue;
+      if(conflict(ds,ct,c.dur)){skip++;continue}
+      S.sessions.push({id:uid(),clientId:c.id,date:ds,time:ct,dur:c.dur,status:"scheduled",kind:"regular",makeup:"none"});add++;
+    }
+  }
+  return {add,skip};
+}
+function regen(c){
+  const T=todayStr();
+  S.sessions=S.sessions.filter(s=>!(s.clientId===c.id&&s.kind==="regular"&&s.status==="scheduled"&&s.date>=T));
+  let r={add:0,skip:0};
+  if(c.status==="active"){const cm=monthOf(T);for(const m of [cm,addMonths(cm,1)]){const x=ensureSessions(m,T);r.add+=x.add;r.skip+=x.skip}}
+  return r;
+}
+function ensurePayments(m){
+  let add=0;
+  for(const c of S.clients){
+    if(c.status!=="active"||m<monthOf(c.start))continue;
+    if(S.payments.some(p=>p.clientId===c.id&&p.month===m))continue;
+    S.payments.push({id:uid(),clientId:c.id,month:m,fee:c.fee,due:m+"-"+pad2(Math.min(c.dueDay,dim(m))),history:[]});add++;
+  }
+  return add;
+}
+const payRec=(cid,m)=>S.payments.find(p=>p.clientId===cid&&p.month===m);
+const paidOf=p=>p.history.reduce((a,h)=>a+h.amt,0);
+const balOf=p=>Math.max(0,p.fee-paidOf(p));
+function payStatus(p){const paid=paidOf(p);if(paid>=p.fee)return "Paid";if(paid>0)return "Partially Paid";return todayStr()>p.due?"Overdue":"Pending"}
+function payChip(p){const s=payStatus(p);const k={"Paid":"g","Partially Paid":"o","Pending":"r","Overdue":"rr"}[s];return `<span class="chip ${k}">${s}</span>`}
+function attStats(cid,m){
+  const ss=S.sessions.filter(x=>x.clientId===cid&&x.date.startsWith(m));
+  const orig=ss.filter(x=>(x.kind==="regular"||x.kind==="onetime")&&x.status!=="cancelled");
+  const mkAll=S.sessions.filter(x=>x.clientId===cid&&x.makeup&&x.makeup!=="none");
+  return {
+    scheduled:orig.length,
+    attended:ss.filter(x=>x.status==="present"&&x.kind!=="makeup").length,
+    missed:orig.filter(x=>x.status==="absent").length,
+    resched:orig.filter(x=>x.status==="rescheduled").length,
+    mkPending:mkAll.filter(x=>x.makeup==="pending"||x.makeup==="scheduled").length,
+    mkDone:mkAll.filter(x=>x.makeup==="done").length,
+    mkMonth:ss.filter(x=>x.kind==="makeup"&&x.status==="present").length
+  };
+}
+const pct=a=>a.scheduled?Math.min(100,Math.round(a.attended/a.scheduled*100)):0;
+function clientsInMonth(m){
+  return S.clients.filter(c=>S.payments.some(p=>p.clientId===c.id&&p.month===m)||S.sessions.some(s=>s.clientId===c.id&&s.date.startsWith(m)));
+}
+function monthTotals(m){
+  const cs=clientsInMonth(m);const t={clients:cs.length,scheduled:0,attended:0,missed:0,resched:0,expected:0,received:0,pending:0};
+  for(const c of cs){const a=attStats(c.id,m);t.scheduled+=a.scheduled;t.attended+=a.attended;t.missed+=a.missed;t.resched+=a.resched;
+    const p=payRec(c.id,m);if(p){t.expected+=p.fee;t.received+=paidOf(p);t.pending+=balOf(p)}}
+  return t;
+}
+function findMsg(cid,m,type){return S.messages.find(x=>x.cid===cid&&x.month===m&&x.type===type)}
+function msgState(cid,m,type){const x=findMsg(cid,m,type);if(!x)return "none";if(x.confirmedAt)return "shared";if(x.openedAt)return "opened";return "ready"}
+function msgChip(cid,m,type){const s=msgState(cid,m,type);
+  if(s==="shared")return '<span class="chip g">Report Shared</span>';
+  if(s==="opened")return '<span class="chip o">Opened, not confirmed</span>';
+  return '<span class="chip gy">Report Not Shared</span>'}
+function ensureMsg(cid,m,type){let x=findMsg(cid,m,type);if(!x){x={id:uid(),cid,month:m,type,genAt:Date.now(),openedAt:null,method:null,confirmedAt:null};S.messages.push(x)}return x}
+function msgSummary(c,m){
+  const a=attStats(c.id,m),p=payRec(c.id,m);
+  let t=`Hi ${c.name.split(" ")[0]}!\n\nHere’s your workout summary for ${MN[+m.slice(5)-1]}:\n\n*YOUR TRAINING SUMMARY*\n• Total Scheduled Sessions: ${a.scheduled}\n• Sessions Attended: ${a.attended}\n• Sessions Missed: ${a.missed}\n• Sessions Rescheduled: ${a.resched}\n`;
+  if(a.mkPending)t+=`• Make-up Sessions Pending: ${a.mkPending}\n`;
+  if(p){t+=`\n*PAYMENT SUMMARY*\n• Monthly Fee: ${inr(p.fee)}\n• Amount Paid: ${inr(paidOf(p))}\n• Outstanding Balance: ${inr(balOf(p))}\n• Payment Status: ${payStatus(p)}\n`}
+  t+=(p&&balOf(p)>0)?`\nWhen convenient, please clear the outstanding balance. Thank you for your effort this month!`:`\nThank you for being consistent with your fitness journey! Keep up the great work.`;
+  return t+`\n\nRegards,\n${S.settings.trainer}`;
+}
+function msgReminder(c,m){
+  const p=payRec(c.id,m);if(!p)return "";
+  return `Hi ${c.name.split(" ")[0]}!\n\nA quick reminder regarding your training fee for ${MN[+m.slice(5)-1]}.\n\nMonthly Fee: ${inr(p.fee)}\nAmount Received: ${inr(paidOf(p))}\nBalance Pending: ${inr(balOf(p))}\n\nRequest you to kindly clear the outstanding amount at your convenience.\n\nThank you!\n${S.settings.trainer}`;
+}
+function closingList(m){
+  const T=todayStr(),cs=clientsInMonth(m);
+  const unmarked=S.sessions.filter(s=>s.date.startsWith(m)&&s.date<T&&s.status==="scheduled").length;
+  const gen=!!S.generated[m];
+  const sumShared=cs.filter(c=>msgState(c.id,m,"summary")==="shared").length;
+  const owing=cs.filter(c=>{const p=payRec(c.id,m);return p&&balOf(p)>0});
+  const remShared=owing.filter(c=>msgState(c.id,m,"reminder")==="shared").length;
+  const payOk=!!(S.closing[m]&&S.closing[m].paymentsOk);
+  const items=[
+    {k:"att",t:"Attendance updated for all clients",ok:unmarked===0,d:unmarked?`${unmarked} past session${unmarked>1?"s":""} still unmarked`:"All past sessions are marked"},
+    {k:"gen",t:"Monthly summaries generated",ok:gen,d:gen?"Generated "+stamp(S.generated[m]):"Tap Generate Monthly Reports"},
+    {k:"pay",t:"Payments updated",ok:payOk,d:payOk?"Confirmed by you":"Tick this once every payment is recorded",manual:true},
+    {k:"pend",t:"Pending payments identified",ok:gen,d:gen?`${owing.length} client${owing.length===1?"":"s"} with a balance`:"Done when reports are generated"},
+    {k:"sum",t:"Client summaries shared",ok:gen&&cs.length>0&&sumShared===cs.length,d:`${sumShared} of ${cs.length} confirmed`},
+    {k:"rem",t:"Payment reminders shared",ok:gen&&remShared===owing.length,d:owing.length?`${remShared} of ${owing.length} confirmed`:"No reminders needed"}
+  ];
+  return {items,pct:Math.round(items.filter(i=>i.ok).length/items.length*100),owing};
+}
+
+/* ---------- seed demo data ---------- */
+function seed(){
+  const T=todayStr(),cm=monthOf(T),pm=addMonths(cm,-1),nm=addMonths(cm,1);
+  S={v:1,settings:{trainer:"Your Fitness Instructor",reminder:true,demo:true},clients:[],sessions:[],payments:[],messages:[],closing:{},generated:{},audit:[]};
+  const st=addMonths(pm,-2)+"-01";
+  const add=(id,name,phone,age,g,fee,dueDay,days,time,dur,notes,status)=>S.clients.push({id,name,phone,age,gender:g,start:st,fee,dueDay,days,time,times:Object.fromEntries(days.map(d=>[d,time])),dur,notes,status:status||"active"});
+  add("c1","Rahul Sharma","+919876543210",29,"Male",3000,5,[1,3,5],"07:00",45,"Strength and mobility. Never misses a session.");
+  add("c2","Priya Nair","+919811122233",34,"Female",4500,5,[2,4,6],"08:00",60,"Weight loss plan. Travels for work now and then.");
+  add("c3","Arjun Mehta","+919845012345",41,"Male",3500,10,[1,3,5],"18:30",45,"Evening slot. Often moves sessions for meetings.");
+  add("c4","Sneha Kulkarni","+919900112233",26,"Female",4000,5,[2,4],"17:00",60,"Prefers make-ups on weekends.");
+  add("c5","Vikram Singh","+919822334455",52,"Male",2500,15,[1,4],"06:30",30,"Light cardio and stretching.");
+  add("c6","Ananya Rao","+919833445566",31,"Female",3000,25,[3,6],"09:30",45,"Yoga-based strength.");
+  add("c7","Karan Patel","+919877665544",38,"Male",3000,5,[2,5],"19:30",45,"Left in September. Kept for records.","inactive");
+  cl("c2").times[6]="11:30";cl("c3").times[5]="19:00";
+  [pm,cm,nm].forEach(m=>ensureSessions(m,null));
+  const sorted=[...S.sessions].sort((a,b)=>a.date.localeCompare(b.date));
+  const cnt={};
+  for(const s of sorted){
+    if(s.date>=T)continue;
+    const n=cnt[s.clientId]=(cnt[s.clientId]||0)+1;
+    switch(s.clientId){
+      case "c1":s.status="present";break;
+      case "c2":if(n%4===0){s.status="absent";if((n/4)%2===1)s.makeup="pending"}else s.status="present";break;
+      case "c3":
+        if(n%5===0){
+          let moved=false;
+          for(let k=1;k<=3&&!moved;k++){const nd=addDays(s.date,k);if(!conflict(nd,s.time,s.dur)){
+            const rep={id:uid(),clientId:s.clientId,date:nd,time:s.time,dur:s.dur,status:nd<T?"present":"scheduled",kind:"replacement",origId:s.id,makeup:"none"};
+            S.sessions.push(rep);s.status="rescheduled";s.movedTo=rep.id;s.reason="Client meeting ran late";moved=true}}
+          if(!moved)s.status="absent";
+        }else s.status="present";break;
+      case "c4":if(n%3===0){s.status="absent";if(n%6===3)s.makeup="pending"}else s.status="present";break;
+      case "c5":s.status=(n%6===0)?"absent":"present";break;
+      case "c6":s.status=(n===3)?"absent":"present";break;
+    }
+  }
+  ensurePayments(pm);ensurePayments(cm);
+  const di=(m,d)=>{const x=m+"-"+pad2(Math.min(d,dim(m)));return x>T?T:x};
+  const rec=(cid,m,amt,d,method)=>{const p=payRec(cid,m);if(p&&amt>0)p.history.push({id:uid(),amt,date:di(m,d),method,note:""})};
+  rec("c1",pm,3000,3,"UPI");rec("c2",pm,4500,6,"UPI");rec("c3",pm,3500,9,"Cash");rec("c4",pm,2000,8,"Cash");rec("c5",pm,2500,14,"Bank transfer");rec("c6",pm,3000,22,"UPI");
+  rec("c1",cm,3000,2,"UPI");rec("c2",cm,2000,7,"UPI");rec("c3",cm,3500,9,"Cash");rec("c5",cm,2500,12,"UPI");
+  S.generated[pm]=Date.now()-86400000*14;S.closing[pm]={paymentsOk:true};
+  for(const cid of ["c1","c2","c3","c5","c6"]){const x=ensureMsg(cid,pm,"summary");x.openedAt=x.genAt;x.confirmedAt=x.genAt;x.method="whatsapp"}
+  const rm=ensureMsg("c4",pm,"reminder");rm.openedAt=rm.genAt;rm.method="sms";
+  aud("system","Demo data loaded");
+}
+function emptyState(){S={v:1,settings:{trainer:"Your Fitness Instructor",reminder:true,demo:false},clients:[],sessions:[],payments:[],messages:[],closing:{},generated:{},audit:[]}}
+
+function afterLoad(){
+  if(!S.settings)S.settings={trainer:"Your Fitness Instructor",reminder:true};
+  const T=todayStr(),cm=monthOf(T);let ch=0;
+  for(const c of S.clients){if(!c.times){c.times={};for(const d of c.days)c.times[d]=c.time;ch++}}
+  ch+=ensureSessions(cm,T).add;ch+=ensureSessions(addMonths(cm,1),T).add;ch+=ensurePayments(cm);
+  if(ch)save();
+}
+
+/* ---------- UI pieces ---------- */
+function toast(t){const el=document.getElementById("toast");el.innerHTML=`<div class="toast" role="status">${esc(t)}</div>`;clearTimeout(toast.t);toast.t=setTimeout(()=>el.innerHTML="",2800)}
+const chipSt=s=>({scheduled:'<span class="chip b">Booked</span>',present:'<span class="chip g">Completed</span>',absent:'<span class="chip r">Absent</span>',rescheduled:'<span class="chip o">Rescheduled</span>',cancelled:'<span class="chip gy">Cancelled</span>'}[s]);
+const kindTag=s=>({replacement:'<span class="chip ol">Replacement</span>',makeup:'<span class="chip ol">Make-up</span>',onetime:'<span class="chip ol">One-time</span>'}[s.kind]||"");
+function attBtns(s,more){
+  if(s.status==="cancelled")return `<div class="seg"><button data-act="att" data-id="${s.id}" data-st="scheduled">Restore session</button></div>`;
+  const b=(st,l)=>`<button class="${s.status===st?"on "+st:""}" data-act="att" data-id="${s.id}" data-st="${st}">${l}</button>`;
+  return `<div class="seg">${b("present","Present")}${b("absent","Absent")}${b("rescheduled","Rescheduled")}${more?`<button data-act="cancelSess" data-id="${s.id}" aria-label="Cancel session">✕</button>`:""}</div>`;
+}
+function sessRow(s,more){
+  const c=cl(s.clientId)||{name:"Removed client",phone:""};
+  let extra="";
+  if(s.status==="rescheduled"&&s.movedTo){const r=sess(s.movedTo);if(r)extra=`<span>Moved to ${dShort(r.date)}, ${t12(r.time)}</span>`}
+  if(s.kind==="replacement"&&s.origId){const o=sess(s.origId);if(o)extra=`<span>Replaces ${dShort(o.date)}</span>`}
+  return `<div class="srow st-${s.status}"><div class="stime">${t12(s.time)}<small>${s.dur} min</small></div>
+  <div class="sinfo"><b>${esc(c.name)}</b><div class="meta"><span>${esc(c.phone)}</span>${chipSt(s.status)}${kindTag(s)}${extra}</div></div>
+  <div class="att">${attBtns(s,more)}</div></div>`;
+}
+const sessOn=d=>S.sessions.filter(s=>s.date===d).sort((a,b)=>a.time.localeCompare(b.time));
+const tile=(l,v,k)=>`<div class="tile ${k||""}"><span>${l}</span><b>${v}</b></div>`;
+function monthNav(act){return `<div class="mn"><button data-act="${act}" data-d="-1" aria-label="Previous month">‹</button><b>${mLabel(ui.month)}</b><button data-act="${act}" data-d="1" aria-label="Next month" ${ui.month>=monthOf(todayStr())?"disabled":""}>›</button></div>`}
+function minMonth(){const all=[...S.sessions.map(s=>s.date.slice(0,7)),...S.payments.map(p=>p.month)].sort();return all[0]||monthOf(todayStr())}
+
+/* ---------- views ---------- */
+function vHome(){
+  const T=todayStr(),ss=sessOn(T),live=ss.filter(x=>!["rescheduled","cancelled"].includes(x.status));
+  const done=live.filter(x=>x.status==="present").length,absent=ss.filter(x=>x.status==="absent").length;
+  const nm=nowMin(),up=live.filter(x=>x.status==="scheduled"&&t2m(x.time)+x.dur>=nm).length;
+  const cm=monthOf(T),recs=S.payments.filter(p=>p.month===cm);
+  const coll=recs.reduce((a,p)=>a+paidOf(p),0),pend=recs.reduce((a,p)=>a+balOf(p),0);
+  const last=T===cm+"-"+pad2(dim(cm));
+  let h="";
+  if(S.settings.reminder&&last)h+=`<div class="banner">It’s the last day of ${MN[+cm.slice(5)-1]}. Verify attendance, update payments, generate reports and send reminders. <button class="btn sm dark" data-act="goMonthly" style="margin-left:6px">Open Monthly Activity</button></div>`;
+  h+=`<div class="tiles">${tile("Active clients",S.clients.filter(c=>c.status==="active").length)}${tile("Sessions today",live.length)}${tile("Completed",done,"g")}${tile("Upcoming",up)}${tile("Marked absent",absent,absent?"r":"")}${tile("Collected this month",inr(coll),"g")}${tile("Pending payments",inr(pend),pend?"o":"")}${tile("Rescheduled today",ss.filter(x=>x.status==="rescheduled").length)}</div>`;
+  h+=`<div class="short"><button class="btn" data-act="clientForm">${ic("users")}Add New Client</button><button class="btn" data-act="goDay">${ic("cal")}View Today’s Schedule</button><button class="btn" data-act="goPay">${ic("rupee")}Record Payment</button><button class="btn" data-act="goMonthly">${ic("clip")}Monthly Activity</button></div>`;
+  h+=`<div class="card"><div class="row"><h2>Today’s Schedule</h2><span class="sp"></span><small>${dShort(T)}</small></div>`;
+  h+=ss.length?ss.map(s=>sessRow(s)).join(""):`<div class="empty">No sessions today. Add a one-time session from Schedule.</div>`;
+  return h+`</div>`;
+}
+function clientRows(){
+  const q=ui.q.trim().toLowerCase(),qd=q.replace(/\D/g,"");
+  const cs=S.clients.filter(c=>!q||c.name.toLowerCase().includes(q)||(qd&&c.phone.replace(/\D/g,"").includes(qd)));
+  const order={active:0,paused:1,inactive:2};
+  cs.sort((a,b)=>order[a.status]-order[b.status]||a.name.localeCompare(b.name));
+  if(!cs.length)return `<div class="empty">No clients match. Try a different name or number.</div>`;
+  const cm=monthOf(todayStr());
+  return cs.map(c=>{const p=payRec(c.id,cm);
+    return `<div class="it" data-act="openClient" data-id="${c.id}"><div class="av">${esc(c.name[0])}</div><div style="flex:1;min-width:0"><b>${esc(c.name)}</b><div class="mute" style="font-size:13px">${slotText(c)} · ${c.dur} min</div></div><div style="text-align:right">${c.status!=="active"?`<span class="chip gy">${c.status==="paused"?"Paused":"Inactive"}</span>`:(p?payChip(p):"")}</div></div>`}).join("");
+}
+function vClients(){
+  if(ui.clientId&&cl(ui.clientId))return vProfile(cl(ui.clientId));
+  return `<div class="row" style="margin-bottom:12px"><input id="q" type="search" placeholder="Search by name or mobile number" value="${esc(ui.q)}" aria-label="Search clients"><button class="btn pri" data-act="clientForm" style="flex:none">+ Add client</button></div><div class="card list" id="clientList">${clientRows()}</div>`;
+}
+function vProfile(c){
+  const T=todayStr(),cm=monthOf(T),a=attStats(c.id,cm),p=payRec(c.id,cm);
+  const out=S.payments.filter(x=>x.clientId===c.id).reduce((s,x)=>s+balOf(x),0);
+  const up=S.sessions.filter(s=>s.clientId===c.id&&s.date>=T&&s.status==="scheduled").sort((x,y)=>(x.date+x.time).localeCompare(y.date+y.time)).slice(0,6);
+  const past=S.sessions.filter(s=>s.clientId===c.id&&s.date<=T&&s.status!=="scheduled").sort((x,y)=>(y.date+y.time).localeCompare(x.date+x.time)).slice(0,12);
+  const moved=S.sessions.filter(s=>s.clientId===c.id&&s.status==="rescheduled").sort((x,y)=>y.date.localeCompare(x.date));
+  const mk=S.sessions.filter(s=>s.clientId===c.id&&(s.makeup==="pending"||s.makeup==="scheduled"));
+  const pays=S.payments.filter(x=>x.clientId===c.id).sort((x,y)=>y.month.localeCompare(x.month));
+  const msgs=S.messages.filter(x=>x.cid===c.id).sort((x,y)=>y.genAt-x.genAt);
+  const sm=pays[0]?pays[0].month:cm;
+  let h=`<button class="btn sm" data-act="back" style="margin-bottom:10px">‹ All clients</button>`;
+  h+=`<div class="card"><div class="row"><div class="av">${esc(c.name[0])}</div><div style="flex:1"><h2>${esc(c.name)}</h2><a class="lnk mute" href="tel:${esc(c.phone)}">${esc(c.phone)}</a></div>${c.status!=="active"?`<span class="chip gy">${c.status==="paused"?"Paused":"Inactive"}</span>`:'<span class="chip g">Active</span>'}</div>
+  <div class="kv" style="margin-top:12px"><div><span>Age</span>${c.age||"—"}</div><div><span>Gender</span>${esc(c.gender||"—")}</div><div><span>Start date</span>${dLabel(c.start)}</div><div><span>Monthly fee</span>${inr(c.fee)}</div><div><span>Payment due</span>${c.dueDay}${["th","st","nd","rd"][(c.dueDay%10<4&&(c.dueDay<11||c.dueDay>13))?c.dueDay%10:0]} of each month</div><div><span>Outstanding</span><b style="color:${out?"var(--red)":"var(--greenD)"}">${inr(out)}</b></div></div>
+  ${c.notes?`<p class="mute" style="margin:10px 0 0">${esc(c.notes)}</p>`:""}
+  <div class="row wrapr" style="margin-top:12px"><button class="btn sm" data-act="clientForm" data-id="${c.id}">Edit details</button>
+  ${c.status==="active"?`<button class="btn sm" data-act="setStatus" data-id="${c.id}" data-st="paused">Pause</button>`:`<button class="btn sm pri" data-act="setStatus" data-id="${c.id}" data-st="active">Make active</button>`}
+  ${c.status!=="inactive"?`<button class="btn sm red" data-act="setStatus" data-id="${c.id}" data-st="inactive">Mark inactive</button>`:""}</div></div>`;
+  h+=`<div class="card"><h3>Regular weekly schedule</h3><p style="margin:6px 0 0">${slotText(c)}<br><span class="mute">${c.dur} minutes each</span></p></div>`;
+  h+=`<div class="card"><div class="row"><h3>${mLabel(cm)} attendance</h3><span class="sp"></span><span class="chip b">${pct(a)}%</span></div><div class="tiles" style="margin:10px 0 0">${tile("Scheduled",a.scheduled)}${tile("Attended",a.attended,"g")}${tile("Missed",a.missed,a.missed?"r":"")}${tile("Rescheduled",a.resched,a.resched?"o":"")}</div></div>`;
+  h+=`<div class="card"><h3>Share with ${esc(c.name.split(" ")[0])}</h3><p class="mute" style="margin:4px 0 10px">Opens WhatsApp or SMS with a message you can edit first. Nothing is sent without you.</p><div class="row wrapr"><button class="btn pri" data-act="share" data-id="${c.id}" data-m="${sm}" data-type="summary">Share Monthly Summary</button>${(p&&balOf(p)>0)||pays.some(x=>balOf(x)>0)?`<button class="btn" data-act="share" data-id="${c.id}" data-m="${(pays.find(x=>balOf(x)>0)||{}).month||sm}" data-type="reminder">Payment reminder</button>`:""}</div></div>`;
+  h+=`<div class="card"><h3>Upcoming sessions</h3>${up.length?up.map(s=>`<div class="row" style="padding:9px 0;border-top:1px solid var(--line)"><div style="flex:1"><b>${dShort(s.date)}</b> · ${t12(s.time)} ${kindTag(s)}</div><button class="btn sm" data-act="reschedModal" data-id="${s.id}">Reschedule</button></div>`).join(""):`<div class="empty">No upcoming sessions.</div>`}</div>`;
+  h+=`<div class="card"><h3>Pending make-up sessions</h3>${mk.length?mk.map(s=>mkRow(s)).join(""):`<div class="empty">None pending.</div>`}</div>`;
+  h+=`<div class="card"><h3>Rescheduled sessions</h3>${moved.length?moved.map(s=>{const r=sess(s.movedTo);return `<div style="padding:8px 0;border-top:1px solid var(--line)">${dShort(s.date)} → <b>${r?dShort(r.date)+", "+t12(r.time):"—"}</b>${s.reason?`<div class="mute" style="font-size:13px">${esc(s.reason)}</div>`:""}</div>`}).join(""):`<div class="empty">None yet.</div>`}</div>`;
+  h+=`<div class="card"><h3>Payment history</h3>${pays.length?`<div class="scroll"><table><tr><th>Month</th><th>Fee</th><th>Paid</th><th>Balance</th><th>Status</th></tr>${pays.map(x=>`<tr><td>${mLabel(x.month)}</td><td>${inr(x.fee)}</td><td>${inr(paidOf(x))}</td><td>${inr(balOf(x))}</td><td>${payChip(x)}</td></tr>`).join("")}</table></div>`:`<div class="empty">No payment records yet.</div>`}</div>`;
+  h+=`<div class="card"><h3>Attendance history</h3>${past.length?past.map(s=>`<div class="row" style="padding:8px 0;border-top:1px solid var(--line)"><span style="flex:1">${dShort(s.date)} · ${t12(s.time)}</span>${kindTag(s)}${chipSt(s.status)}</div>`).join(""):`<div class="empty">No history yet.</div>`}</div>`;
+  h+=`<div class="card"><h3>Message history</h3>${msgs.length?msgs.map(x=>`<div style="padding:8px 0;border-top:1px solid var(--line);font-size:13.5px"><b>${x.type==="summary"?"Monthly summary":"Payment reminder"}</b> · ${mLabel(x.month)}<div class="mute">Generated ${stamp(x.genAt)} · ${x.method?(x.method==="wa"||x.method==="whatsapp"?"WhatsApp":"SMS"):"No method yet"} · Opened: ${x.openedAt?"Yes":"No"} · Confirmed sent: ${x.confirmedAt?"Yes":"No"}</div></div>`).join(""):`<div class="empty">No messages yet.</div>`}</div>`;
+  return h;
+}
+function mkRow(s){
+  const c=cl(s.clientId);
+  return `<div style="padding:9px 0;border-top:1px solid var(--line)"><div class="row"><div style="flex:1"><b>${c?esc(c.name):""}</b> missed ${dShort(s.date)}${s.makeup==="scheduled"?` <span class="chip o">Make-up booked</span>`:""}</div></div>
+  <div class="row wrapr" style="margin-top:6px">${s.makeup==="pending"?`<button class="btn sm pri" data-act="mkModal" data-id="${s.id}">Schedule make-up</button><button class="btn sm" data-act="mkNone" data-id="${s.id}">Not needed</button>`:`<button class="btn sm" data-act="mkNone" data-id="${s.id}">Not needed</button>`}</div></div>`;
+}
+
+function vSchedule(){
+  const tabs=`<div class="tabs">${["day","week","month"].map(v=>`<button class="${ui.sv===v?"on":""}" data-act="sv" data-v="${v}">${v[0].toUpperCase()+v.slice(1)}</button>`).join("")}</div>`;
+  const step=ui.sv==="day"?1:ui.sv==="week"?7:30;
+  let title="";
+  if(ui.sv==="day")title=dShort(ui.sd)+" "+pd(ui.sd).getUTCFullYear();
+  else if(ui.sv==="week"){const ws=weekStart(ui.sd);title=dShort(ws)+" – "+dShort(addDays(ws,6))}
+  else title=mLabel(monthOf(ui.sd));
+  let h=tabs+`<div class="mn"><button data-act="sNav" data-d="-1" aria-label="Previous">‹</button><b>${title}</b><button data-act="sNav" data-d="1" aria-label="Next">›</button></div><div class="row wrapr" style="margin-bottom:12px"><button class="btn sm" data-act="sToday">Today</button><span class="sp"></span><button class="btn pri sm" data-act="addSess">+ One-time session</button></div>`;
+  const lg=`<div class="lg"><span><i style="background:var(--navy2)"></i>Booked</span><span><i style="background:var(--green)"></i>Completed</span><span><i style="background:#D64545"></i>Absent</span><span><i style="background:#A9B2C2"></i>Rescheduled / cancelled</span><span><i style="border:1px solid var(--grey)"></i>Available</span></div>`;
+  if(ui.sv==="day"){
+    const ss=sessOn(ui.sd);
+    h+=`<div class="card">${ss.length?ss.map(s=>sessRow(s,true)).join(""):`<div class="empty">Nothing booked. This day is free.</div>`}</div>`;
+  }else if(ui.sv==="week"){
+    const ws=weekStart(ui.sd);
+    for(let i=0;i<7;i++){const d=addDays(ws,i),ss=sessOn(d);
+      h+=`<div class="card"><div class="row"><b>${dShort(d)}</b>${d===todayStr()?'<span class="chip g">Today</span>':""}<span class="sp"></span><button class="btn sm" data-act="openDay" data-d="${d}">Open day</button></div>${ss.length?ss.map(s=>`<div class="row" style="padding:7px 0;border-top:1px solid var(--line)"><span style="width:78px;font-weight:700">${t12(s.time)}</span><span style="flex:1">${esc((cl(s.clientId)||{}).name||"")}</span>${chipSt(s.status)}</div>`).join(""):`<div class="mute" style="margin-top:6px;font-size:13px">Available all day</div>`}</div>`}
+    h+=lg;
+  }else{
+    const m=monthOf(ui.sd),first=m+"-01",lead=(dow(first)+6)%7;
+    let g=["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map(x=>`<div class="h">${x}</div>`).join("");
+    for(let i=0;i<lead;i++)g+=`<div class="d empty"></div>`;
+    for(let d=1;d<=dim(m);d++){const ds=m+"-"+pad2(d),ss=sessOn(ds);
+      const col=s=>s.status==="present"?"var(--green)":s.status==="absent"?"#D64545":(s.status==="rescheduled"||s.status==="cancelled")?"#A9B2C2":"var(--navy2)";
+      g+=`<button class="d ${ds===todayStr()?"today":""}" data-act="openDay" data-d="${ds}"><b>${d}</b><div class="dots">${ss.slice(0,8).map(s=>`<i style="background:${col(s)}"></i>`).join("")}</div></button>`}
+    h+=`<div class="cal">${g}</div>`+lg;
+  }
+  return h+(ui.sv==="day"?lg:"");
+}
+function weekStart(d){const w=(dow(d)+6)%7;return addDays(d,-w)}
+
+function vAttendance(){
+  const ss=sessOn(ui.ad);
+  let h=`<div class="mn"><button data-act="aNav" data-d="-1" aria-label="Previous day">‹</button><b>${dShort(ui.ad)}</b><button data-act="aNav" data-d="1" aria-label="Next day">›</button></div>`;
+  h+=`<div class="card"><div class="row"><h2>Mark attendance</h2><span class="sp"></span><button class="btn sm" data-act="aToday">Today</button></div>${ss.length?ss.map(s=>sessRow(s)+(s.status==="absent"?`<div class="row" style="padding:0 0 10px"><span class="mute" style="font-size:13px;flex:1">Does ${esc(cl(s.clientId).name.split(" ")[0])} get a make-up?</span><button class="btn sm ${s.makeup==="pending"||s.makeup==="scheduled"||s.makeup==="done"?"pri":""}" data-act="mkFlag" data-id="${s.id}" data-v="pending">Yes</button><button class="btn sm ${(!s.makeup||s.makeup==="none")?"dark":""}" data-act="mkNone" data-id="${s.id}">No</button></div>`:"")).join(""):`<div class="empty">No sessions on this day.</div>`}</div>`;
+  const all=S.sessions.filter(s=>s.makeup&&s.makeup!=="none");
+  const pend=all.filter(s=>s.makeup==="pending"||s.makeup==="scheduled");
+  h+=`<div class="card"><h2>Make-up sessions</h2><div class="tiles" style="margin:10px 0">${tile("Pending make-up",all.filter(s=>s.makeup==="pending").length,"o")}${tile("Booked",all.filter(s=>s.makeup==="scheduled").length)}${tile("Completed",all.filter(s=>s.makeup==="done").length,"g")}${tile("Still outstanding",pend.length,pend.length?"r":"")}</div>${pend.length?pend.map(mkRow).join(""):`<div class="empty">No make-up sessions outstanding.</div>`}</div>`;
+  h+=`<h2 style="margin:18px 0 8px">Monthly attendance report</h2>`+monthNav("mNav");
+  const cs=clientsInMonth(ui.month);
+  h+=`<div class="card scroll">${cs.length?`<table><tr><th>Client</th><th>Scheduled</th><th>Attended</th><th>Missed</th><th>Resched.</th><th>Make-ups due</th><th>Rate</th></tr>${cs.map(c=>{const a=attStats(c.id,ui.month);return `<tr><td><b>${esc(c.name)}</b></td><td>${a.scheduled}</td><td>${a.attended}</td><td>${a.missed}</td><td>${a.resched}</td><td>${a.mkPending}</td><td>${pct(a)}%</td></tr>`}).join("")}</table>`:`<div class="empty">No sessions in this month.</div>`}</div>`;
+  return h+`<p class="mute" style="font-size:12.5px">A rescheduled original counts once as Rescheduled. Its replacement session counts as Attended when completed. Make-up sessions are tracked separately.</p>`;
+}
+
+function vPayments(){
+  const m=ui.month;if(m===monthOf(todayStr())&&ensurePayments(m))save();
+  const recs=S.payments.filter(p=>p.month===m).sort((a,b)=>cl(a.clientId).name.localeCompare(cl(b.clientId).name));
+  const exp=recs.reduce((a,p)=>a+p.fee,0),col=recs.reduce((a,p)=>a+paidOf(p),0);
+  let h=monthNav("mNav")+`<div class="tiles">${tile("Expected revenue",inr(exp))}${tile("Collected",inr(col),"g")}${tile("Outstanding",inr(exp-col),exp-col?"r":"")}${tile("Paid / Pending",recs.filter(p=>payStatus(p)==="Paid").length+" / "+recs.filter(p=>payStatus(p)!=="Paid").length)}</div>`;
+  h+=recs.length?recs.map(p=>{const c=cl(p.clientId),open=ui.payOpen===p.id;
+    return `<div class="card"><div class="row"><div style="flex:1"><b>${esc(c.name)}</b><div class="mute" style="font-size:13px">Due ${dLabel(p.due)}</div></div>${payChip(p)}</div>
+    <div class="kv" style="margin:10px 0"><div><span>Fee</span>${inr(p.fee)}</div><div><span>Paid</span>${inr(paidOf(p))}</div><div><span>Balance</span><b style="color:${balOf(p)?"var(--red)":"var(--greenD)"}">${inr(balOf(p))}</b></div><div><span>Last payment</span>${p.history.length?dLabel(p.history[p.history.length-1].date)+" · "+esc(p.history[p.history.length-1].method):"—"}</div></div>
+    <div class="row wrapr"><button class="btn sm pri" data-act="payModal" data-id="${p.id}" ${balOf(p)?"":"disabled"}>Record payment</button><button class="btn sm" data-act="payHist" data-id="${p.id}">${open?"Hide history":"History"}</button>${balOf(p)?`<button class="btn sm" data-act="share" data-id="${c.id}" data-m="${m}" data-type="reminder">Remind</button>`:""}<button class="btn sm" data-act="feeModal" data-id="${p.id}">Edit fee</button></div>
+    ${open?payHist(p):""}</div>`}).join(""):`<div class="card empty">No payment records for this month.${m===monthOf(todayStr())?" Add an active client to start billing.":""}</div>`;
+  return h+`<p class="mute" style="font-size:12.5px">Recording a payment only updates your records. It does not move any money. Fees do not change when a client misses a session.</p>`;
+}
+function payHist(p){
+  const ents=p.history.map((e,i)=>`<div style="padding:8px 0;border-top:1px solid var(--line)"><div class="row"><div style="flex:1"><b>${inr(e.amt)}</b> · ${dLabel(e.date)} · ${esc(e.method)}${e.note?`<div class="mute" style="font-size:12.5px">${esc(e.note)}</div>`:""}</div><button class="btn sm" data-act="payModal" data-id="${p.id}" data-i="${i}">Edit</button></div>${(e.trail||[]).map(t=>`<div class="mute" style="font-size:12px">Edited ${stamp(t.ts)}: ${esc(t.text)}</div>`).join("")}</div>`).join("");
+  const au=S.audit.filter(a=>a.type==="payment"&&a.pid===p.id).slice(0,5).map(a=>`<div class="mute" style="font-size:12px">${stamp(a.ts)} · ${esc(a.text)}</div>`).join("");
+  return `<div style="margin-top:10px">${ents||`<div class="mute">No payments recorded yet.</div>`}${au?`<div style="margin-top:8px"><b style="font-size:12.5px">Audit trail</b>${au}</div>`:""}</div>`;
+}
+
+function vMonthly(){
+  const m=ui.month,cur=m===monthOf(todayStr());
+  let h=monthNav("mNav")+`<div class="tabs"><button class="${ui.mtab==="closing"?"on":""}" data-act="mtab" data-v="closing">Monthly closing</button><button class="${ui.mtab==="reports"?"on":""}" data-act="mtab" data-v="reports">Reports</button></div>`;
+  return h+(ui.mtab==="closing"?vClosing(m,cur):vReports(m));
+}
+function vClosing(m,cur){
+  const T=monthTotals(m),cs=clientsInMonth(m),cl2=closingList(m);
+  let h=`<div class="tiles">${tile("Active clients",T.clients)}${tile("Sessions scheduled",T.scheduled)}${tile("Attended",T.attended,"g")}${tile("Missed",T.missed,T.missed?"r":"")}${tile("Rescheduled",T.resched,T.resched?"o":"")}${tile("Expected revenue",inr(T.expected))}${tile("Payments received",inr(T.received),"g")}${tile("Pending payments",inr(T.pending),T.pending?"r":"")}</div>`;
+  h+=`<button class="btn pri blk" style="min-height:54px;font-size:16px;margin-bottom:12px" data-act="gen">Generate Monthly Reports</button>`;
+  h+=`<div class="card"><div class="row"><h2>Monthly closing checklist</h2><span class="sp"></span><b>${cl2.pct}%</b></div><div class="prog" style="margin:10px 0"><i style="width:${cl2.pct}%"></i></div>${cl2.items.map(i=>`<div class="chk"><div class="dot ${i.ok?"ok":""}">${i.ok?"✓":""}</div><div style="flex:1"><b>${i.t}</b><div class="mute" style="font-size:13px">${i.d}</div></div>${i.manual?`<button class="btn sm ${i.ok?"":"pri"}" data-act="payOk">${i.ok?"Undo":"Confirm"}</button>`:""}</div>`).join("")}</div>`;
+  h+=`<div class="card"><h2>Client-wise status</h2>${cs.length?cs.map(c=>{const a=attStats(c.id,m),p=payRec(c.id,m);
+    return `<div style="padding:12px 0;border-top:1px solid var(--line)"><div class="row"><b style="flex:1">${esc(c.name)}</b>${p?payChip(p):'<span class="chip gy">No fee record</span>'}</div>
+    <div class="mute" style="font-size:13px;margin:4px 0 8px">Attended ${a.attended} of ${a.scheduled}${p?` · Fee ${inr(p.fee)} · Paid ${inr(paidOf(p))} · Owes ${inr(balOf(p))}`:""}</div>
+    <div class="row wrapr">${msgChip(c.id,m,"summary")}<span class="sp"></span><button class="btn sm" data-act="share" data-id="${c.id}" data-m="${m}" data-type="summary">Summary</button>${p&&balOf(p)>0?`<button class="btn sm" data-act="share" data-id="${c.id}" data-m="${m}" data-type="reminder">Reminder</button>`:""}</div></div>`}).join(""):`<div class="empty">No clients in this month.</div>`}</div>`;
+  h+=`<div class="card"><h2>Bulk sharing</h2><p class="mute" style="margin:4px 0 10px">Each message opens for your review. You confirm every one yourself.</p><div class="row wrapr"><button class="btn dark" data-act="bulk" data-type="summary">Share all monthly summaries</button><button class="btn" data-act="bulk" data-type="reminder">Share all pending payment reminders</button></div></div>`;
+  return h;
+}
+function vReports(m){
+  const T=monthTotals(m),cs=clientsInMonth(m);
+  let h=`<div class="card"><h2>Monthly business summary</h2><div class="tiles" style="margin:10px 0 0">${tile("Active clients",T.clients)}${tile("Sessions conducted",T.attended,"g")}${tile("Expected revenue",inr(T.expected))}${tile("Collected",inr(T.received),"g")}${tile("Outstanding",inr(T.pending),T.pending?"r":"")}${tile("Collection rate",(T.expected?Math.round(T.received/T.expected*100):0)+"%")}</div></div>`;
+  h+=`<div class="card scroll"><h2 style="margin-bottom:6px">Client-wise summary</h2>${cs.length?`<table><tr><th>Client</th><th>Attendance</th><th>Rate</th><th>Make-ups due</th><th>Fee</th><th>Paid</th><th>Status</th></tr>${cs.map(c=>{const a=attStats(c.id,m),p=payRec(c.id,m);return `<tr><td><b>${esc(c.name)}</b></td><td>${a.attended}/${a.scheduled}</td><td>${pct(a)}%</td><td>${a.mkPending}</td><td>${p?inr(p.fee):"—"}</td><td>${p?inr(paidOf(p)):"—"}</td><td>${p?payChip(p):"—"}</td></tr>`}).join("")}</table>`:`<div class="empty">No data.</div>`}</div>`;
+  const ms=[...new Set(S.payments.map(p=>p.month))].sort();
+  const rows=ms.map(x=>{const t=monthTotals(x);return {m:x,e:t.expected,c:t.received,o:t.pending}});
+  const mx=Math.max(1,...rows.map(r=>r.e));
+  h+=`<div class="card"><h2>Revenue by month</h2>${rows.map((r,i)=>{const prev=rows[i-1];const d=prev&&prev.c?Math.round((r.c-prev.c)/prev.c*100):null;return `<div class="bar"><span style="width:84px">${MON[+r.m.slice(5)-1]} ${r.m.slice(2,4)}</span><div class="tr"><i style="width:${r.e/mx*100}%"></i><u style="width:${r.c/mx*100}%"></u></div><span style="width:130px;text-align:right">${inr(r.c)} of ${inr(r.e)}${d!=null?`<small style="display:block">${d>=0?"+":""}${d}% vs previous</small>`:""}</span></div>`}).join("")||`<div class="empty">No revenue data yet.</div>`}<div class="lg"><span><i style="background:var(--green)"></i>Collected</span><span><i style="background:var(--navy2);opacity:.4"></i>Expected</span></div></div>`;
+  h+=`<div class="card"><h2>Export</h2><div class="row wrapr" style="margin-top:10px"><button class="btn" data-act="exCsv">Excel (CSV)</button><button class="btn" data-act="exHtml">Printable report</button><button class="btn" data-act="exJson">Full backup</button></div><p class="mute" style="font-size:12.5px;margin:10px 0 0">Open the printable report in your browser and choose Print, then Save as PDF.</p></div>`;
+  return h;
+}
+
+/* ---------- modals ---------- */
+const M=()=>document.getElementById("m");
+function sheet(title,body){return `<div class="ov" data-act="ovClose"><div class="sheet" id="m" role="dialog" aria-modal="true" aria-label="${esc(title)}"><div class="hd"><h2 style="flex:1">${esc(title)}</h2><button class="x" data-act="close" aria-label="Close">✕</button></div>${body}</div></div>`}
+const val=id=>{const e=document.getElementById(id);return e?e.value:""};
+function paintModal(){
+  const el=document.getElementById("modal"),m=ui.modal;
+  if(!m){el.innerHTML="";return}
+  let h="";
+  if(m.type==="client"){
+    const c=m.id?cl(m.id):{name:"",phone:"+91",age:"",gender:"",start:todayStr(),fee:"",dueDay:5,days:[1,3,5],times:{1:"07:00",3:"07:00",5:"07:00"},time:"07:00",dur:45,notes:""};
+    h=sheet(m.id?"Edit client":"New client",`<label class="f">Full name</label><input id="f_name" value="${esc(c.name)}" autocomplete="off">
+    <label class="f">Mobile number with country code</label><input id="f_phone" value="${esc(c.phone)}" inputmode="tel" placeholder="+919876543210">
+    <div class="g2"><div><label class="f">Age (optional)</label><input id="f_age" type="number" min="5" max="99" value="${esc(c.age)}"></div><div><label class="f">Gender (optional)</label><select id="f_gender">${["","Female","Male","Other"].map(x=>`<option ${c.gender===x?"selected":""}>${x}</option>`).join("")}</select></div></div>
+    <div class="g2"><div><label class="f">Start date</label><input id="f_start" type="date" value="${c.start}"></div><div><label class="f">Monthly fee (₹)</label><input id="f_fee" type="number" min="0" inputmode="numeric" value="${esc(c.fee)}"></div></div>
+    <label class="f">Payment due day of month</label><input id="f_due" type="number" min="1" max="28" value="${c.dueDay}">
+    <label class="f">Workout days, with a time for each day</label>${[1,2,3,4,5,6,0].map(d=>{const t=slotTime(c,d);return `<div class="row" style="margin:6px 0"><label class="dchip" style="width:84px;flex:none"><input type="checkbox" name="day" value="${d}" ${t?"checked":""}><span>${DW[d]}</span></label><input type="time" id="t${d}" value="${t||"07:00"}" aria-label="${DW[d]} time"></div>`}).join("")}
+    <div><div><label class="f">Session length</label><select id="f_dur">${[30,45,60].map(x=>`<option value="${x}" ${c.dur===x?"selected":""}>${x} minutes</option>`).join("")}</select></div></div>
+    <label class="f">Notes</label><textarea id="f_notes" style="min-height:70px">${esc(c.notes)}</textarea>
+    <button class="btn pri blk" style="margin-top:14px" data-act="saveClient" data-id="${m.id||""}">Save client</button>`);
+  }else if(m.type==="pay"){
+    const p=pay(m.id),c=cl(p.clientId),e=m.i!=null?p.history[m.i]:null;
+    h=sheet(e?"Edit payment":"Record payment",`<p style="margin:0"><b>${esc(c.name)}</b> · ${mLabel(p.month)}<br><span class="mute">Balance ${inr(balOf(p))}</span></p>
+    <label class="f">Amount received (₹)</label><input id="p_amt" type="number" min="1" inputmode="numeric" value="${e?e.amt:balOf(p)}">
+    <div class="g2"><div><label class="f">Payment date</label><input id="p_date" type="date" value="${e?e.date:todayStr()}"></div><div><label class="f">Method</label><select id="p_method">${["Cash","UPI","Bank transfer","Other"].map(x=>`<option ${e&&e.method===x?"selected":""}>${x}</option>`).join("")}</select></div></div>
+    <label class="f">Note (optional)</label><input id="p_note" value="${e?esc(e.note||""):""}">
+    <button class="btn pri blk" style="margin-top:14px" data-act="savePay" data-id="${p.id}" data-i="${m.i==null?"":m.i}">${e?"Save changes":"Save payment"}</button>
+    <p class="mute" style="font-size:12.5px;margin:10px 0 0">This only updates your records. No money is moved.</p>`);
+  }else if(m.type==="fee"){
+    const p=pay(m.id);
+    h=sheet("Edit monthly fee",`<p style="margin:0">${esc(cl(p.clientId).name)} · ${mLabel(p.month)}</p><label class="f">Fee for this month (₹)</label><input id="fe_fee" type="number" min="0" value="${p.fee}"><label class="f">Due date</label><input id="fe_due" type="date" value="${p.due}"><button class="btn pri blk" style="margin-top:14px" data-act="saveFee" data-id="${p.id}">Save</button>`);
+  }else if(m.type==="resched"){
+    const s=sess(m.id),c=cl(s.clientId);
+    h=sheet("Reschedule session",`<p style="margin:0"><b>${esc(c.name)}</b><br><span class="mute">Original: ${dShort(s.date)}, ${t12(s.time)}. Their weekly schedule stays the same.</span></p>
+    <div class="g2"><div><label class="f">New date</label><input id="r_date" type="date" value="${addDays(s.date,1)}"></div><div><label class="f">New time</label><input id="r_time" type="time" value="${s.time}"></div></div>
+    <label class="f">Reason (optional)</label><input id="r_reason" placeholder="e.g. Travelling">
+    <button class="btn pri blk" style="margin-top:14px" data-act="saveResched" data-id="${s.id}">Save revised session</button>`);
+  }else if(m.type==="makeup"){
+    const s=sess(m.id),c=cl(s.clientId);
+    h=sheet("Schedule make-up",`<p style="margin:0"><b>${esc(c.name)}</b><br><span class="mute">For the session missed on ${dShort(s.date)}</span></p>
+    <div class="g2"><div><label class="f">Date</label><input id="k_date" type="date" value="${addDays(todayStr(),1)}"></div><div><label class="f">Time</label><input id="k_time" type="time" value="${s.time}"></div></div>
+    <button class="btn pri blk" style="margin-top:14px" data-act="saveMakeup" data-id="${s.id}">Book make-up</button>`);
+  }else if(m.type==="addSess"){
+    const act=S.clients.filter(c=>c.status==="active");
+    h=sheet("One-time session",act.length?`<label class="f">Client</label><select id="o_client">${act.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join("")}</select>
+    <div class="g2"><div><label class="f">Date</label><input id="o_date" type="date" value="${ui.sd}"></div><div><label class="f">Time</label><input id="o_time" type="time" value="10:00"></div></div>
+    <label class="f">Length</label><select id="o_dur">${[30,45,60].map(x=>`<option value="${x}" ${x===45?"selected":""}>${x} minutes</option>`).join("")}</select>
+    <button class="btn pri blk" style="margin-top:14px" data-act="saveSess">Add session</button><p class="mute" style="font-size:12.5px;margin:10px 0 0">This does not change their regular weekly schedule.</p>`:`<div class="empty">Add an active client first.</div>`);
+  }else if(m.type==="share"){
+    const c=cl(m.cid),rec=ensureMsg(m.cid,m.month,m.mtype);
+    if(m.text==null){m.text=m.mtype==="summary"?msgSummary(c,m.month):msgReminder(c,m.month)}
+    const st=msgState(m.cid,m.month,m.mtype);
+    h=sheet(m.mtype==="summary"?"Share monthly summary":"Payment reminder",`<p style="margin:0"><b>${esc(c.name)}</b> · ${mLabel(m.month)} · <span class="mute">${esc(c.phone)}</span></p>
+    <label class="f">Message preview. You can edit it.</label><textarea id="s_text">${esc(m.text)}</textarea>
+    <div class="row wrapr" style="margin-top:10px"><a class="btn pri" data-act="openMsg" data-via="wa" target="_blank" rel="noopener" href="#">Open WhatsApp</a><a class="btn" data-act="openMsg" data-via="sms" target="_blank" rel="noopener" href="#">Open SMS</a></div>
+    <div class="card" style="margin:12px 0 0;background:var(--bg)">${st==="shared"?`<b>Confirmed sent</b> ${stamp(rec.confirmedAt)}`:st==="opened"?`<b>Opened ${rec.method==="wa"?"WhatsApp":"SMS"} ${stamp(rec.openedAt)}.</b><div class="mute" style="margin:2px 0 8px">Opening the app does not mean it was sent. Did you send it?</div><div class="row"><button class="btn sm pri" data-act="msgConfirm">Yes, I sent it</button><button class="btn sm" data-act="msgReset">Not sent</button></div>`:`<span class="mute">Not opened yet. Nothing is sent until you press send in WhatsApp or SMS.</span>`}</div>`);
+  }else if(m.type==="bulk"){
+    const cs=clientsInMonth(m.month).filter(c=>{if(m.mtype==="summary")return true;const p=payRec(c.id,m.month);return p&&balOf(p)>0});
+    h=sheet(m.mtype==="summary"?"Share all summaries":"Share all reminders",`<p class="mute" style="margin:0 0 6px">${mLabel(m.month)}. Review and confirm each message one at a time.</p>${cs.length?cs.map(c=>{const s=msgState(c.id,m.month,m.mtype);return `<div class="row" style="padding:10px 0;border-top:1px solid var(--line)"><div style="flex:1"><b>${esc(c.name)}</b><div>${s==="shared"?'<span class="chip g">Sent (confirmed)</span>':s==="opened"?'<span class="chip o">Opened, not confirmed</span>':'<span class="chip gy">Not shared</span>'}</div></div><button class="btn sm ${s==="shared"?"":"pri"}" data-act="shareFrom" data-id="${c.id}" data-m="${m.month}" data-type="${m.mtype}">${s==="shared"?"View":"Review & send"}</button></div>`}).join(""):`<div class="empty">Nobody needs a message this month.</div>`}`);
+  }else if(m.type==="settings"){
+    h=sheet("Settings",`<label class="f">Name shown at the end of messages</label><input id="st_name" value="${esc(S.settings.trainer)}">
+    <label class="dchip" style="display:flex;gap:10px;align-items:center;margin:14px 0;position:static"><input type="checkbox" id="st_rem" style="position:static;width:22px;min-height:22px" ${S.settings.reminder?"checked":""}><span style="border:0;padding:0;background:none">Remind me on the last day of the month</span></label>
+    <button class="btn pri blk" data-act="saveSettings">Save settings</button>
+    <div class="row wrapr" style="margin-top:12px"><button class="btn sm" data-act="exJson">Download backup</button><button class="btn sm" data-act="confirmReset" data-v="demo">${ui.confirm==="demo"?"Tap again to confirm":"Reload demo data"}</button><button class="btn sm red" data-act="confirmReset" data-v="clear">${ui.confirm==="clear"?"Tap again to erase everything":"Start fresh"}</button></div>
+    <h3 style="margin-top:18px">Recent changes</h3>${S.audit.slice(0,12).map(a=>`<div class="mute" style="font-size:12.5px;padding:3px 0">${stamp(a.ts)} · ${esc(a.text)}</div>`).join("")||`<div class="mute">Nothing yet.</div>`}`);
+  }
+  el.innerHTML=h;
+}
+function openModal(o){ui.modal=o;paintModal()}
+function closeModal(){const b=ui.modal&&ui.modal.back;ui.modal=b||null;ui.confirm=null;paintModal();render()}
+
+/* ---------- actions ---------- */
+function setAtt(id,st){
+  const s=sess(id);if(!s)return;
+  if(st==="rescheduled"&&s.status!=="rescheduled"){openModal({type:"resched",id});return}
+  const old=s.status;
+  if(old===st&&st!=="scheduled")st="scheduled";
+  if(old==="rescheduled"&&st!=="rescheduled"){
+    const r=sess(s.movedTo);
+    if(r&&["present","absent"].includes(r.status)){toast("The replacement already has attendance. Reset it first.");return}
+    S.sessions=S.sessions.filter(x=>x.id!==s.movedTo);s.movedTo=null;
+  }
+  s.status=st;
+  if(s.kind==="makeup"&&s.origId){const o=sess(s.origId);if(o){if(st==="present")o.makeup="done";else if(o.makeup==="done")o.makeup="scheduled"}}
+  aud("attendance",`${(cl(s.clientId)||{}).name}, ${dShort(s.date)}: ${old} → ${st}`);
+  save();render();
+}
+function act(a,d,el){
+  switch(a){
+    case "nav":ui.tab=d.v;ui.clientId=null;render(true);break;
+    case "settings":openModal({type:"settings"});break;
+    case "close":closeModal();break;
+    case "ovClose":break;
+    case "goMonthly":ui.tab="monthly";render(true);break;
+    case "goPay":ui.tab="payments";ui.month=monthOf(todayStr());render(true);break;
+    case "goDay":ui.tab="schedule";ui.sv="day";ui.sd=todayStr();render(true);break;
+    case "openClient":ui.clientId=d.id;render(true);break;
+    case "back":ui.clientId=null;render(true);break;
+    case "clientForm":openModal({type:"client",id:d.id||null});break;
+    case "saveClient":saveClient(d.id);break;
+    case "setStatus":{const c=cl(d.id);c.status=d.st;const r=regen(c);aud("client",`${c.name} set to ${d.st}`);if(d.st==="active")ensurePayments(monthOf(todayStr()));save();toast(d.st==="active"?`${c.name} is active again`:`${c.name} is now ${d.st}. Future sessions removed.`);render();break}
+    case "att":setAtt(d.id,d.st);break;
+    case "cancelSess":{const s=sess(d.id);s.status="cancelled";if(s.kind==="makeup"&&s.origId){const o=sess(s.origId);if(o)o.makeup="pending"}aud("attendance",`${cl(s.clientId).name}, ${dShort(s.date)}: cancelled`);save();render();break}
+    case "reschedModal":openModal({type:"resched",id:d.id});break;
+    case "saveResched":saveResched(d.id);break;
+    case "mkModal":openModal({type:"makeup",id:d.id});break;
+    case "saveMakeup":saveMakeup(d.id);break;
+    case "mkNone":{const s=sess(d.id);s.makeup="none";save();render();break}
+    case "mkFlag":{const s=sess(d.id);s.makeup="pending";save();toast("Make-up marked as pending");render();break}
+    case "sv":ui.sv=d.v;render();break;
+    case "sNav":{const n=+d.d;ui.sd=ui.sv==="month"?addMonths(monthOf(ui.sd),n)+"-01":addDays(ui.sd,n*(ui.sv==="week"?7:1));render();break}
+    case "sToday":ui.sd=todayStr();render();break;
+    case "openDay":ui.sv="day";ui.sd=d.d;render(true);break;
+    case "addSess":openModal({type:"addSess"});break;
+    case "saveSess":saveSess();break;
+    case "aNav":ui.ad=addDays(ui.ad,+d.d);render();break;
+    case "aToday":ui.ad=todayStr();render();break;
+    case "mNav":{const m=addMonths(ui.month,+d.d);if(m>monthOf(todayStr())||m<minMonth())return;ui.month=m;render();break}
+    case "payModal":openModal({type:"pay",id:d.id,i:d.i!==undefined&&d.i!==""?+d.i:null});break;
+    case "savePay":savePay(d.id,d.i);break;
+    case "payHist":ui.payOpen=ui.payOpen===d.id?null:d.id;render();break;
+    case "feeModal":openModal({type:"fee",id:d.id});break;
+    case "saveFee":{const p=pay(d.id),f=+val("fe_fee"),du=val("fe_due");if(!(f>=0)||!du){toast("Enter a fee and due date");return}aud("payment",`${cl(p.clientId).name} ${mLabel(p.month)} fee ${inr(p.fee)} → ${inr(f)}`);S.audit[0].pid=p.id;p.fee=f;p.due=du;save();closeModal();break}
+    case "mtab":ui.mtab=d.v;render();break;
+    case "gen":generate();break;
+    case "payOk":{const c=S.closing[ui.month]=S.closing[ui.month]||{};c.paymentsOk=!c.paymentsOk;save();render();break}
+    case "bulk":openModal({type:"bulk",mtype:d.type,month:ui.month});break;
+    case "share":openModal({type:"share",cid:d.id,month:d.m,mtype:d.type,text:null});save();break;
+    case "shareFrom":openModal({type:"share",cid:d.id,month:d.m,mtype:d.type,text:null,back:ui.modal});save();break;
+    case "openMsg":openMsg(d.via,el);break;
+    case "msgConfirm":{const x=findMsg(ui.modal.cid,ui.modal.month,ui.modal.mtype);x.confirmedAt=Date.now();aud("message",`${cl(x.cid).name}: ${x.type} confirmed sent`);save();ui.modal.text=val("s_text");paintModal();render();break}
+    case "msgReset":{const x=findMsg(ui.modal.cid,ui.modal.month,ui.modal.mtype);x.openedAt=null;x.method=null;x.confirmedAt=null;save();ui.modal.text=val("s_text");paintModal();break}
+    case "saveSettings":S.settings.trainer=val("st_name").trim()||"Your Fitness Instructor";S.settings.reminder=document.getElementById("st_rem").checked;save();closeModal();toast("Settings saved");break;
+    case "confirmReset":
+      if(ui.confirm!==d.v){ui.confirm=d.v;paintModal();return}
+      ui.confirm=null;
+      if(d.v==="demo")seed();else emptyState();
+      afterLoad();ui.clientId=null;ui.modal=null;ui.month=monthOf(todayStr());save();paintModal();render(true);toast(d.v==="demo"?"Demo data loaded":"Everything cleared");break;
+    case "exCsv":exportCsv();break;
+    case "exHtml":exportHtml();break;
+    case "exJson":doSave("fittrack-backup-"+todayStr()+".json",JSON.stringify(S,null,1));break;
+  }
+}
+function saveClient(id){
+  const name=val("f_name").trim(),phone=val("f_phone").replace(/[\s-]/g,""),fee=+val("f_fee"),due=+val("f_due");
+  const days=[...document.querySelectorAll('#m input[name=day]:checked')].map(x=>+x.value);
+  if(!name){toast("Enter the client’s name");return}
+  if(!/^\+\d{8,15}$/.test(phone)){toast("Enter the mobile number with country code, like +919876543210");return}
+  if(!(fee>=0)||val("f_fee")===""){toast("Enter the monthly fee");return}
+  if(!(due>=1&&due<=28)){toast("Due day must be between 1 and 28");return}
+  if(!days.length){toast("Pick at least one workout day");return}
+  const times={};for(const d of days){const t=val("t"+d);if(!t){toast("Enter a time for "+DW[d]);return}times[d]=t}
+  if(!val("f_start")){toast("Enter a start date");return}
+  const data={name,phone,age:val("f_age"),gender:val("f_gender"),start:val("f_start"),fee,dueDay:due,days,times,time:times[days[0]],dur:+val("f_dur"),notes:val("f_notes").trim()};
+  let c,r;
+  if(id){c=cl(id);const sch=JSON.stringify(c.times)!==JSON.stringify(times)||c.dur!==data.dur||c.start!==data.start;Object.assign(c,data);r=sch?regen(c):{add:0,skip:0};
+    const p=payRec(c.id,monthOf(todayStr()));if(p&&p.history.length===0)p.fee=fee;
+    aud("client",`${name} updated`)}
+  else{c=Object.assign({id:uid(),status:"active"},data);S.clients.push(c);r=regen(c);ensurePayments(monthOf(todayStr()));aud("client",`${name} added`)}
+  save();ui.modal=null;paintModal();ui.clientId=c.id;ui.tab="clients";render(true);
+  toast(r.skip?`Saved. ${r.skip} session${r.skip>1?"s":""} skipped because the time is taken.`:"Client saved");
+}
+function saveResched(id){
+  const s=sess(id),d=val("r_date"),t=val("r_time");
+  if(!d||!t){toast("Choose a new date and time");return}
+  if(d<todayStr()){toast("Choose today or a future date");return}
+  const x=conflict(d,t,s.dur,id);
+  if(x){toast(`That slot overlaps ${cl(x.clientId).name} at ${t12(x.time)}. Pick another time.`);return}
+  const rep={id:uid(),clientId:s.clientId,date:d,time:t,dur:s.dur,status:"scheduled",kind:"replacement",origId:s.id,makeup:"none"};
+  S.sessions.push(rep);s.status="rescheduled";s.movedTo=rep.id;s.reason=val("r_reason").trim();
+  aud("attendance",`${cl(s.clientId).name}: ${dShort(s.date)} rescheduled to ${dShort(d)} ${t12(t)}`);
+  save();ui.modal=null;paintModal();render();toast("Session rescheduled");
+}
+function saveMakeup(id){
+  const s=sess(id),d=val("k_date"),t=val("k_time");
+  if(!d||!t){toast("Choose a date and time");return}
+  const x=conflict(d,t,s.dur);
+  if(x){toast(`That slot overlaps ${cl(x.clientId).name} at ${t12(x.time)}. Pick another time.`);return}
+  const mk={id:uid(),clientId:s.clientId,date:d,time:t,dur:s.dur,status:"scheduled",kind:"makeup",origId:s.id,makeup:"none"};
+  S.sessions.push(mk);s.makeup="scheduled";s.makeupId=mk.id;
+  aud("attendance",`${cl(s.clientId).name}: make-up booked for ${dShort(d)}`);
+  save();ui.modal=null;paintModal();render();toast("Make-up booked");
+}
+function saveSess(){
+  const cid=val("o_client"),d=val("o_date"),t=val("o_time"),du=+val("o_dur");
+  if(!d||!t){toast("Choose a date and time");return}
+  const x=conflict(d,t,du);
+  if(x){toast(`That slot overlaps ${cl(x.clientId).name} at ${t12(x.time)}. Pick another time.`);return}
+  S.sessions.push({id:uid(),clientId:cid,date:d,time:t,dur:du,status:"scheduled",kind:"onetime",makeup:"none"});
+  aud("schedule",`One-time session added for ${cl(cid).name}, ${dShort(d)}`);
+  ui.sd=d;ui.sv="day";save();ui.modal=null;paintModal();render();toast("Session added");
+}
+function savePay(pid,i){
+  const p=pay(pid),amt=+val("p_amt"),date=val("p_date"),method=val("p_method"),note=val("p_note").trim();
+  if(!(amt>0)||!date){toast("Enter an amount and a date");return}
+  const c=cl(p.clientId);
+  if(i!==""&&i!=null){
+    const e=p.history[+i],others=paidOf(p)-e.amt;
+    if(others+amt>p.fee*1.0001&&!confirmOver()){return}
+    const ch=[];if(e.amt!==amt)ch.push(`amount ${inr(e.amt)} → ${inr(amt)}`);if(e.date!==date)ch.push(`date ${dLabel(e.date)} → ${dLabel(date)}`);if(e.method!==method)ch.push(`method ${e.method} → ${method}`);
+    if(ch.length){e.trail=(e.trail||[]);e.trail.push({ts:Date.now(),text:ch.join(", ")});aud("payment",`${c.name} ${mLabel(p.month)}: ${ch.join(", ")}`);S.audit[0].pid=p.id}
+    Object.assign(e,{amt,date,method,note});
+  }else{
+    if(amt>balOf(p)){toast(`That is more than the ${inr(balOf(p))} balance.`);return}
+    p.history.push({id:uid(),amt,date,method,note});
+    aud("payment",`${c.name} ${mLabel(p.month)}: recorded ${inr(amt)} via ${method}`);S.audit[0].pid=p.id;
+  }
+  save();ui.modal=null;paintModal();ui.payOpen=p.id;render();toast("Payment saved");
+}
+function confirmOver(){toast("That would exceed the monthly fee. Lower the amount.");return false}
+function generate(){
+  const m=ui.month;if(m===monthOf(todayStr()))ensurePayments(m);
+  const cs=clientsInMonth(m);let n=0,r=0;
+  for(const c of cs){ensureMsg(c.id,m,"summary");n++;const p=payRec(c.id,m);if(p&&balOf(p)>0){ensureMsg(c.id,m,"reminder");r++}}
+  S.generated[m]=Date.now();aud("report",`Reports generated for ${mLabel(m)}`);save();render();
+  toast(`${n} summaries ready. ${r} payment reminder${r===1?"":"s"} needed.`);
+}
+function openMsg(via,el){
+  const m=ui.modal,c=cl(m.cid),text=val("s_text");m.text=text;
+  const x=ensureMsg(m.cid,m.month,m.mtype);x.openedAt=Date.now();x.method=via;x.confirmedAt=null;
+  const num=c.phone.replace(/\D/g,"");
+  el.href=via==="wa"?`https://wa.me/${num}?text=${encodeURIComponent(text)}`:`sms:${c.phone}?&body=${encodeURIComponent(text)}`;
+  aud("message",`${c.name}: ${m.mtype} opened in ${via==="wa"?"WhatsApp":"SMS"}`);
+  save();setTimeout(()=>{if(ui.modal===m){paintModal()}render()},500);
+}
+async function doSave(filename,data){
+  try{
+    if(!window.claude||!claude.use){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([data]));a.download=filename;document.body.appendChild(a);a.click();a.remove();toast("File downloaded");return}
+    const dl=await claude.use("downloads");if(!dl)throw 0;
+    await dl.save({filename,data});toast("File ready");
+  }catch(e){if(e&&e.code==="declined")return;toast("Saving files isn’t available in this view.")}
+}
+const csvCell=v=>{v=String(v==null?"":v);return /[",\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v};
+function exportCsv(){
+  const m=ui.month,rows=[["Client","Phone","Month","Scheduled","Attended","Missed","Rescheduled","Attendance %","Make-ups pending","Fee","Paid","Outstanding","Status"]];
+  for(const c of clientsInMonth(m)){const a=attStats(c.id,m),p=payRec(c.id,m);rows.push([c.name,c.phone,mLabel(m),a.scheduled,a.attended,a.missed,a.resched,pct(a),a.mkPending,p?p.fee:"",p?paidOf(p):"",p?balOf(p):"",p?payStatus(p):""])}
+  doSave(`fittrack-${m}.csv`,"\ufeff"+rows.map(r=>r.map(csvCell).join(",")).join("\n"));
+}
+function exportHtml(){
+  const m=ui.month,T=monthTotals(m);
+  const rows=clientsInMonth(m).map(c=>{const a=attStats(c.id,m),p=payRec(c.id,m);return `<tr><td>${esc(c.name)}</td><td>${a.attended}/${a.scheduled}</td><td>${pct(a)}%</td><td>${p?inr(p.fee):"-"}</td><td>${p?inr(paidOf(p)):"-"}</td><td>${p?inr(balOf(p)):"-"}</td><td>${p?payStatus(p):"-"}</td></tr>`}).join("");
+  const html=`<!DOCTYPE html><html><head><meta charset="utf-8"><title>FitTrack report ${mLabel(m)}</title><style>body{font-family:system-ui,sans-serif;margin:32px;color:#0F1E36}table{border-collapse:collapse;width:100%}th,td{border:1px solid #ccd3de;padding:8px;text-align:left}th{background:#0F1E36;color:#fff}</style></head><body><h1>Monthly report: ${mLabel(m)}</h1><p>Active clients: ${T.clients}. Sessions attended: ${T.attended} of ${T.scheduled}. Expected ${inr(T.expected)}, collected ${inr(T.received)}, outstanding ${inr(T.pending)}.</p><table><tr><th>Client</th><th>Attended</th><th>Rate</th><th>Fee</th><th>Paid</th><th>Balance</th><th>Status</th></tr>${rows}</table></body></html>`;
+  doSave(`fittrack-report-${m}.html`,html);
+}
+
+/* ---------- render ---------- */
+function render(top){
+  if(!S)return;
+  const y=window.scrollY;
+  const v={home:vHome,clients:vClients,schedule:vSchedule,attendance:vAttendance,payments:vPayments,monthly:vMonthly}[ui.tab];
+  document.getElementById("app").innerHTML=(mode==="local"?`<div class="banner" style="font-size:13px">Cloud saving isn’t available here, so your data is stored on this device only.</div>`:"")+v();
+  document.getElementById("nav").innerHTML=NAV.map(n=>`<button class="${ui.tab===n[0]?"on":""}" data-act="nav" data-v="${n[0]}" aria-label="${n[1]}">${ic(n[2])}<span>${n[1]}</span></button>`).join("");
+  document.getElementById("sub").textContent=dLabel(todayStr())+(S.settings.demo?" · Demo data":"");
+  window.scrollTo(0,top?0:y);
+  paintSv();
+}
+document.getElementById("gear").innerHTML=ic("gear");
+document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");if(!b)return;
+  if(b.dataset.act==="ovClose"){if(e.target===b)closeModal();return}
+  if(b.disabled)return;
+  if(b.tagName==="A"&&b.dataset.act!=="openMsg")e.preventDefault();
+  act(b.dataset.act,b.dataset,b);
+});
+document.addEventListener("input",e=>{
+  if(e.target.id==="q"){ui.q=e.target.value;const l=document.getElementById("clientList");if(l)l.innerHTML=clientRows()}
+});
+
+/* ---------- boot ---------- */
+function loadLocal(){
+  mode="local";
+  try{const r=localStorage.getItem(LS);if(r)S=JSON.parse(r)}catch(e){}
+  if(!S){seed();save()}
+  afterLoad();render();
+}
+async function boot(){
+  let db=null,user=null;
+  try{if(window.claude&&claude.use){db=await Promise.race([claude.use("db"),new Promise(r=>setTimeout(()=>r(null),10000))]);user=await claude.use("user")}}catch(e){db=null}
+  if(!db||!user){loadLocal();return}
+  let id=null;try{id=await user.id()}catch(e){}
+  if(!id){loadLocal();return}
+  mode="cloud";
+  try{docRef=db.doc("data/users/"+id+"/fittrack")}catch(e){loadLocal();return}
+  let first=true;
+  const fallback=setTimeout(()=>{if(!S)loadLocal()},10000);
+  docRef.onSnapshot(snap=>{
+    clearTimeout(fallback);
+    if(snap.exists){
+      const d=snap.data();
+      if(S&&d.updated===lastW)return;
+      if(S&&ui.modal)return;
+      try{S=JSON.parse(d.json)}catch(e){if(!S){seed();save()}}
+      if(first){first=false;afterLoad()}
+      saveState="Cloud synced";render();
+    }else if(!S){seed();afterLoad();save();render()}
+  },err=>{if(!S)loadLocal()});
+}
+boot();
+</script>
+</body>
+</html>
